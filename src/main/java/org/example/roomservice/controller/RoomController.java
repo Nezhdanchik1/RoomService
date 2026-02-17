@@ -84,4 +84,12 @@ public class RoomController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/users/{userId}")
+    public List<RoomDto> getUserRooms(@PathVariable Long userId) {
+        return userRoomService.getUserRooms(userId)
+                .stream()
+                .map(roomMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +63,10 @@ public class UserRoomService {
     }
 
     // Получить комнаты пользователя
-    public List<UserRoom> getUserRooms(Long userId) {
-        return userRoomRepository.findById_UserId(userId);
+    public List<Room> getUserRooms(Long userId) {
+        List<UserRoom> userRooms = userRoomRepository.findById_UserId(userId);
+        return userRooms.stream()
+                .map(UserRoom::getRoom)
+                .collect(Collectors.toList());
     }
 }
