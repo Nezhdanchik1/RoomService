@@ -32,7 +32,7 @@ public class RoomController {
                 dto.getDirectionId(),
                 dto.getName(),
                 dto.getDescription(),
-                dto.isPrivate()
+                dto.getIsPrivate()
         );
         return roomMapper.toDto(room);
     }
@@ -83,4 +83,5 @@ public class RoomController {
                 .map(userRoomMapper::toDto)
                 .collect(Collectors.toList());
     }
+
 }

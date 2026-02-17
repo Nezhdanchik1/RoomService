@@ -12,5 +12,6 @@ public class RoomDto {
     private Long directionId;
     private String name;
     private String description;
-    private boolean isPrivate;
+
+    private Boolean isPrivate = false;
 }

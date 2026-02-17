@@ -28,8 +28,7 @@ public class Room {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private boolean isPrivate = false;
+    private Boolean isPrivate = false;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
