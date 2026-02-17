@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-user-rooms
+      author: room-service
+      changes:
+        - createTable:
+            tableName: user_rooms
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: room_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: joined_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: room_role
+                  type: VARCHAR(20)
+                  defaultValue: MEMBER
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: user_rooms
+            columnNames: user_id, room_id
+            constraintName: pk_user_rooms
+
+        - addForeignKeyConstraint:
+            constraintName: fk_user_rooms_room
+            baseTableName: user_rooms
+            baseColumnNames: room_id
+            referencedTableName: rooms
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: user_rooms
+            indexName: idx_user_rooms_room
+            columns:
+              - column:
+                  name: room_id
+
+        - createIndex:
+            tableName: user_rooms
+            indexName: idx_user_rooms_user
+            columns:
+              - column:
+                  name: user_id
+
+      rollback:
+        - dropTable:
+            tableName: user_rooms

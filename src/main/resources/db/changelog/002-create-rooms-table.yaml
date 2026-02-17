@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-rooms
+      author: room-service
+      changes:
+        - createTable:
+            tableName: rooms
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: direction_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: is_private
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_rooms_direction
+            baseTableName: rooms
+            baseColumnNames: direction_id
+            referencedTableName: directions
+            referencedColumnNames: id
+            onDelete: RESTRICT
+
+        - createIndex:
+            tableName: rooms
+            indexName: idx_rooms_direction
+            columns:
+              - column:
+                  name: direction_id
+
+      rollback:
+        - dropTable:
+            tableName: rooms

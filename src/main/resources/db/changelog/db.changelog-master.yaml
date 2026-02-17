@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/001-create-directions-table.yaml
+  - include:
+      file: db/changelog/002-create-rooms-table.yaml
+  - include:
+      file: db/changelog/003-create-user-rooms-table.yaml
