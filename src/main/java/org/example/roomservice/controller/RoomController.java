@@ -40,7 +40,7 @@ public class RoomController {
     // Получить комнату по id
     @GetMapping("/{id}")
     public RoomDto getRoom(@PathVariable Long id) {
-        return roomMapper.toDto(roomService.getRoomById(id));
+        return roomService.getRoomById(id);
     }
 
     // Получить комнаты направления

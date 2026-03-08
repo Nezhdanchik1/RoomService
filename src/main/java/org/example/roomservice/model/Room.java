@@ -33,9 +33,6 @@ public class Room {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserRoom> members;
-
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

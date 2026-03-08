@@ -26,7 +26,7 @@ public class UserRoomService {
 
     // Вступление пользователя
     public UserRoom joinRoom(Long userId, Long roomId, RoomRole role) {
-        Room room = roomService.getRoomById(roomId);
+        Room room = roomService.getRoom(roomId);
         UserRoomId id = new UserRoomId(userId, roomId);
 
         if (userRoomRepository.existsById(id)) {
@@ -58,7 +58,7 @@ public class UserRoomService {
 
     // Получить участников комнаты
     public List<UserRoom> getMembers(Long roomId) {
-        Room room = roomService.getRoomById(roomId);
+        Room room = roomService.getRoom(roomId);
         return userRoomRepository.findByRoom(room);
     }
 

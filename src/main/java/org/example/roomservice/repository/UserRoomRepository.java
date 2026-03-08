@@ -5,6 +5,7 @@ import org.example.roomservice.model.RoomRole;
 import org.example.roomservice.model.UserRoom;
 import org.example.roomservice.model.UserRoomId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,6 +13,13 @@ import java.util.Optional;
 
 @Repository
 public interface UserRoomRepository extends JpaRepository<UserRoom, UserRoomId> {
+
+    @Query("""
+        SELECT ur.id.userId
+        FROM UserRoom ur
+        WHERE ur.id.roomId = :roomId
+    """)
+    List<Long> findUserIdsByRoomId(Long roomId);
 
     // Список участников комнаты
     List<UserRoom> findByRoom(Room room);

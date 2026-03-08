@@ -2,6 +2,8 @@ package org.example.roomservice.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,4 +16,7 @@ public class RoomDto {
     private String description;
 
     private Boolean isPrivate = false;
+    private Long participantsCount;
+    private Long onlineCount;
+    private List<UserPresenceDto> members;
 }
