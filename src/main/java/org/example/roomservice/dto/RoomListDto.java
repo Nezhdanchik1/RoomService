@@ -2,6 +2,8 @@ package org.example.roomservice.dto;
 
 import lombok.*;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,4 +17,5 @@ public class RoomListDto {
     private Long directionId;
     private Long participantsCount;
     private Long postsCount;
+    private Set<String> tags;
 }

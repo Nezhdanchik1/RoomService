@@ -3,6 +3,7 @@ package org.example.roomservice.dto;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,4 +20,5 @@ public class OneRoomDto {
     private Long participantsCount;
     private Long onlineCount;
     private List<UserPresenceDto> members;
+    private Set<String> tags;
 }

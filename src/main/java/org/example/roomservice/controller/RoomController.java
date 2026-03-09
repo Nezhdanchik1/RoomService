@@ -34,9 +34,16 @@ public class RoomController {
                 dto.getDirectionId(),
                 dto.getName(),
                 dto.getDescription(),
-                dto.getIsPrivate()
+                dto.getIsPrivate(),
+                dto.getTags()
         );
         return roomMapper.toDto(room);
+    }
+
+    // Поиск по тегу
+    @GetMapping("/tag/{tagName}")
+    public List<RoomListDto> getRoomsByTag(@PathVariable String tagName) {
+        return roomService.findRoomsByTag(tagName);
     }
 
     // Получить комнату по id

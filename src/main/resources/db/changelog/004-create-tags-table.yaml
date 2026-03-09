@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-tags-table
+      author: antigravity
+      changes:
+        - createTable:
+            tableName: tags
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+
+  - changeSet:
+      id: 005-create-room-tags-table
+      author: antigravity
+      changes:
+        - createTable:
+            tableName: room_tags
+            columns:
+              - column:
+                  name: room_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            columnNames: room_id, tag_id
+            constraintName: pk_room_tags
+            tableName: room_tags
+        - addForeignKeyConstraint:
+            baseColumnNames: room_id
+            baseTableName: room_tags
+            constraintName: fk_room_tags_room
+            referencedColumnNames: id
+            referencedTableName: rooms
+        - addForeignKeyConstraint:
+            baseColumnNames: tag_id
+            baseTableName: room_tags
+            constraintName: fk_room_tags_tag
+            referencedColumnNames: id
+            referencedTableName: tags
