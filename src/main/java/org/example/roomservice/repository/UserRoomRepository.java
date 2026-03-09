@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface UserRoomRepository extends JpaRepository<UserRoom, UserRoomId> {
@@ -21,15 +20,18 @@ public interface UserRoomRepository extends JpaRepository<UserRoom, UserRoomId> 
     """)
     List<Long> findUserIdsByRoomId(Long roomId);
 
+    @Query("""
+        SELECT ur.id.roomId, COUNT(ur.id.userId)
+        FROM UserRoom ur
+        WHERE ur.id.roomId IN :roomIds
+        GROUP BY ur.id.roomId
+    """)
+    List<Object[]> countParticipants(List<Long> roomIds);
+
     // Список участников комнаты
     List<UserRoom> findByRoom(Room room);
-
-    // Найти конкретного пользователя в комнате
-    Optional<UserRoom> findById_UserIdAndRoom(Long userId, Room room);
 
     // Список комнат пользователя
     List<UserRoom> findById_UserId(Long userId);
 
-    // Проверка роли пользователя
-    Optional<UserRoom> findById_UserIdAndRoomAndRoomRole(Long userId, Room room, RoomRole role);
 }

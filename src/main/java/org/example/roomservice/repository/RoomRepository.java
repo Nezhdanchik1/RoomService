@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
     // Все комнаты для конкретного направления
-    List<Room> findByDirection(Direction direction);
+    List<Room> findRoomsByDirection(Direction direction);
 
     // Найти комнату по name в рамках направления
     Optional<Room> findByDirectionAndName(Direction direction, String name);

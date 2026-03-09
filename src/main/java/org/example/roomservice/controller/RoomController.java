@@ -1,7 +1,8 @@
 package org.example.roomservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.roomservice.dto.RoomDto;
+import org.example.roomservice.dto.OneRoomDto;
+import org.example.roomservice.dto.RoomListDto;
 import org.example.roomservice.dto.UserRoomDto;
 import org.example.roomservice.mapper.RoomMapper;
 import org.example.roomservice.mapper.UserRoomMapper;
@@ -11,6 +12,7 @@ import org.example.roomservice.model.UserRoom;
 import org.example.roomservice.service.RoomService;
 import org.example.roomservice.service.UserRoomService;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +29,7 @@ public class RoomController {
 
     // Создать комнату
     @PostMapping
-    public RoomDto createRoom(@RequestBody RoomDto dto) {
+    public RoomListDto createRoom(@RequestBody RoomListDto dto) {
         Room room = roomService.createRoom(
                 dto.getDirectionId(),
                 dto.getName(),
@@ -39,17 +41,14 @@ public class RoomController {
 
     // Получить комнату по id
     @GetMapping("/{id}")
-    public RoomDto getRoom(@PathVariable Long id) {
+    public OneRoomDto getRoom(@PathVariable Long id) {
         return roomService.getRoomById(id);
     }
 
     // Получить комнаты направления
     @GetMapping("/direction/{directionId}")
-    public List<RoomDto> getRoomsByDirection(@PathVariable Long directionId) {
-        return roomService.getRoomsByDirection(directionId)
-                .stream()
-                .map(roomMapper::toDto)
-                .collect(Collectors.toList());
+    public Mono<List<RoomListDto>> getRoomsByDirection(@PathVariable Long directionId) {
+        return roomService.getRoomsByDirection(directionId);
     }
 
     // Удалить комнату
@@ -85,7 +84,7 @@ public class RoomController {
     }
 
     @GetMapping("/users/{userId}")
-    public List<RoomDto> getUserRooms(@PathVariable Long userId) {
+    public List<RoomListDto> getUserRooms(@PathVariable Long userId) {
         return userRoomService.getUserRooms(userId)
                 .stream()
                 .map(roomMapper::toDto)
