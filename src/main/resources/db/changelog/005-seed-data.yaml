@@ -1,9 +1,9 @@
 databaseChangeLog:
   - changeSet:
-      id: 006-seed-data
+      id: 006-seed-data-v2
       author: antigravity
       changes:
-        # Directions (1, 2, 3)
+        # Directions
         - insert:
             tableName: directions
             columns:
@@ -23,7 +23,7 @@ databaseChangeLog:
               - column: { name: name, value: "DevOps" }
               - column: { name: description, value: "Infrastructure, CI/CD, Cloud, and automation." }
 
-        # Rooms for Frontend (1-5)
+        # Rooms for Frontend
         - insert:
             tableName: rooms
             columns:
@@ -60,7 +60,7 @@ databaseChangeLog:
               - column: { name: name, value: "CSS & Design" }
               - column: { name: description, value: "Animations, Tailwind, and UI/UX best practices." }
 
-        # Rooms for Backend (8-12)
+        # Rooms for Backend
         - insert:
             tableName: rooms
             columns:
@@ -97,7 +97,7 @@ databaseChangeLog:
               - column: { name: name, value: "DBMS & Arch" }
               - column: { name: description, value: "SQL vs NoSQL, system design and scalability." }
 
-        # Rooms for DevOps (13-17)
+        # Rooms for DevOps
         - insert:
             tableName: rooms
             columns:
@@ -237,26 +237,108 @@ databaseChangeLog:
               - column: { name: name, value: "IaC" }
 
         # RoomTags relations
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 1 }, { name: tag_id, valueNumeric: 1 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 1 }, { name: tag_id, valueNumeric: 2 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 4 }, { name: tag_id, valueNumeric: 7 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 4 }, { name: tag_id, valueNumeric: 8 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 5 }, { name: tag_id, valueNumeric: 9 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 5 }, { name: tag_id, valueNumeric: 10 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 6 }, { name: tag_id, valueNumeric: 1 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 6 }, { name: tag_id, valueNumeric: 11 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 7 }, { name: tag_id, valueNumeric: 12 } ] } }
-
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 2 }, { name: tag_id, valueNumeric: 3 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 2 }, { name: tag_id, valueNumeric: 4 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 8 }, { name: tag_id, valueNumeric: 13 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 9 }, { name: tag_id, valueNumeric: 14 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 10 }, { name: tag_id, valueNumeric: 15 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 11 }, { name: tag_id, valueNumeric: 16 } ] } }
-
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 3 }, { name: tag_id, valueNumeric: 5 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 3 }, { name: tag_id, valueNumeric: 6 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 12 }, { name: tag_id, valueNumeric: 17 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 13 }, { name: tag_id, valueNumeric: 18 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 14 }, { name: tag_id, valueNumeric: 19 } ] } }
-        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 15 }, { name: tag_id, valueNumeric: 20 } ] } }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 1 }
+              - column: { name: tag_id, valueNumeric: 1 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 1 }
+              - column: { name: tag_id, valueNumeric: 2 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 4 }
+              - column: { name: tag_id, valueNumeric: 7 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 4 }
+              - column: { name: tag_id, valueNumeric: 8 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 5 }
+              - column: { name: tag_id, valueNumeric: 9 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 5 }
+              - column: { name: tag_id, valueNumeric: 10 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 6 }
+              - column: { name: tag_id, valueNumeric: 1 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 6 }
+              - column: { name: tag_id, valueNumeric: 11 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 7 }
+              - column: { name: tag_id, valueNumeric: 12 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 2 }
+              - column: { name: tag_id, valueNumeric: 3 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 2 }
+              - column: { name: tag_id, valueNumeric: 4 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 8 }
+              - column: { name: tag_id, valueNumeric: 13 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 9 }
+              - column: { name: tag_id, valueNumeric: 14 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 10 }
+              - column: { name: tag_id, valueNumeric: 15 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 11 }
+              - column: { name: tag_id, valueNumeric: 16 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 3 }
+              - column: { name: tag_id, valueNumeric: 5 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 3 }
+              - column: { name: tag_id, valueNumeric: 6 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 12 }
+              - column: { name: tag_id, valueNumeric: 17 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 13 }
+              - column: { name: tag_id, valueNumeric: 18 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 14 }
+              - column: { name: tag_id, valueNumeric: 19 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 15 }
+              - column: { name: tag_id, valueNumeric: 20 }
