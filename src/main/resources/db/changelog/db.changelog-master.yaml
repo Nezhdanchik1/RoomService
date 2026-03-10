@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/003-create-user-rooms-table.yaml
   - include:
       file: db/changelog/004-create-tags-table.yaml
+  - include:
+      file: db/changelog/005-seed-data.yaml

@@ -1,0 +1,262 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-seed-data
+      author: antigravity
+      changes:
+        # Directions (1, 2, 3)
+        - insert:
+            tableName: directions
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "Frontend" }
+              - column: { name: description, value: "Client-side development with React, Vue, Angular, etc." }
+        - insert:
+            tableName: directions
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "Backend" }
+              - column: { name: description, value: "Server-side development with Java, Python, Go, Node.js, etc." }
+        - insert:
+            tableName: directions
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: name, value: "DevOps" }
+              - column: { name: description, value: "Infrastructure, CI/CD, Cloud, and automation." }
+
+        # Rooms for Frontend (1-5)
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "React & Next.js" }
+              - column: { name: description, value: "Discuss modern frontend frameworks and performance." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "Vue.js & Nuxt" }
+              - column: { name: description, value: "Discussion about Vue, Nuxt, and Vite ecosystems." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "Angular Hub" }
+              - column: { name: description, value: "Enterprise frontend development with Angular." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "Mobile with RN" }
+              - column: { name: description, value: "Building cross-platform apps with React Native." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "CSS & Design" }
+              - column: { name: description, value: "Animations, Tailwind, and UI/UX best practices." }
+
+        # Rooms for Backend (8-12)
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "Java & Spring Boot" }
+              - column: { name: description, value: "Everything about JVM, Spring, and enterprise Java." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "Python Backend" }
+              - column: { name: description, value: "Django, FastAPI, and data services with Python." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 9 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "Golang Devs" }
+              - column: { name: description, value: "High-performance services with Go language." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 10 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "Node.js & JS" }
+              - column: { name: description, value: "Asynchronous backend development with JavaScript." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 11 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "DBMS & Arch" }
+              - column: { name: description, value: "SQL vs NoSQL, system design and scalability." }
+
+        # Rooms for DevOps (13-17)
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: direction_id, valueNumeric: 3 }
+              - column: { name: name, value: "Docker & K8s" }
+              - column: { name: description, value: "Containerization and orchestration practices." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 12 }
+              - column: { name: direction_id, valueNumeric: 3 }
+              - column: { name: name, value: "Cloud AWS/Azure" }
+              - column: { name: description, value: "Cloud provider services and architectures." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 13 }
+              - column: { name: direction_id, valueNumeric: 3 }
+              - column: { name: name, value: "CI/CD Autom." }
+              - column: { name: description, value: "GitHub Actions, GitLab CI, and Jenkins." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 14 }
+              - column: { name: direction_id, valueNumeric: 3 }
+              - column: { name: name, value: "Monitoring" }
+              - column: { name: description, value: "Prometheus, Grafana, and observability." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 15 }
+              - column: { name: direction_id, valueNumeric: 3 }
+              - column: { name: name, value: "Terraform & IaC" }
+              - column: { name: description, value: "Infrastructure as Code and automation." }
+
+        # Tags
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "React" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "Next.js" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: name, value: "Java" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: name, value: "Spring" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: name, value: "Docker" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: name, value: "Kubernetes" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: name, value: "Vue" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: name, value: "Nuxt" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 9 }
+              - column: { name: name, value: "Angular" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 10 }
+              - column: { name: name, value: "TypeScript" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 11 }
+              - column: { name: name, value: "Mobile" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 12 }
+              - column: { name: name, value: "Design" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 13 }
+              - column: { name: name, value: "Python" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 14 }
+              - column: { name: name, value: "Go" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 15 }
+              - column: { name: name, value: "Node.js" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 16 }
+              - column: { name: name, value: "Architecture" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 17 }
+              - column: { name: name, value: "AWS" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 18 }
+              - column: { name: name, value: "Automaton" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 19 }
+              - column: { name: name, value: "Observability" }
+        - insert:
+            tableName: tags
+            columns:
+              - column: { name: id, valueNumeric: 20 }
+              - column: { name: name, value: "IaC" }
+
+        # RoomTags relations
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 1 }, { name: tag_id, valueNumeric: 1 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 1 }, { name: tag_id, valueNumeric: 2 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 4 }, { name: tag_id, valueNumeric: 7 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 4 }, { name: tag_id, valueNumeric: 8 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 5 }, { name: tag_id, valueNumeric: 9 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 5 }, { name: tag_id, valueNumeric: 10 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 6 }, { name: tag_id, valueNumeric: 1 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 6 }, { name: tag_id, valueNumeric: 11 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 7 }, { name: tag_id, valueNumeric: 12 } ] } }
+
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 2 }, { name: tag_id, valueNumeric: 3 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 2 }, { name: tag_id, valueNumeric: 4 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 8 }, { name: tag_id, valueNumeric: 13 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 9 }, { name: tag_id, valueNumeric: 14 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 10 }, { name: tag_id, valueNumeric: 15 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 11 }, { name: tag_id, valueNumeric: 16 } ] } }
+
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 3 }, { name: tag_id, valueNumeric: 5 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 3 }, { name: tag_id, valueNumeric: 6 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 12 }, { name: tag_id, valueNumeric: 17 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 13 }, { name: tag_id, valueNumeric: 18 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 14 }, { name: tag_id, valueNumeric: 19 } ] } }
+        - { insert: { tableName: room_tags, columns: [ { name: room_id, valueNumeric: 15 }, { name: tag_id, valueNumeric: 20 } ] } }
