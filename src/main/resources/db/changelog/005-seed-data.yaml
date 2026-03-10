@@ -2,6 +2,14 @@ databaseChangeLog:
   - changeSet:
       id: 006-seed-data-v2
       author: antigravity
+
+      preConditions:
+        - onFail: MARK_RAN
+        - onError: MARK_RAN
+        - sqlCheck:
+             expectedResult: 0
+             sql: SELECT COUNT(*) FROM directions
+
       changes:
         # Directions
         - insert:
