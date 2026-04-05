@@ -22,7 +22,7 @@ public class UserRoomService {
 
     private final UserRoomRepository userRoomRepository;
     private final RoomService roomService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final org.example.roomservice.producer.RoomEventProducer roomEventProducer;
 
     // Вступление пользователя
     public UserRoom joinRoom(Long userId, Long roomId, RoomRole role) {
@@ -41,7 +41,7 @@ public class UserRoomService {
 
         UserRoom saved = userRoomRepository.save(userRoom);
 
-//        eventPublisher.publishEvent(new UserJoinedRoomEvent(this, userId, roomId));
+        roomEventProducer.sendUserJoinedEvent(userId, roomId, role);
 
         return saved;
     }
