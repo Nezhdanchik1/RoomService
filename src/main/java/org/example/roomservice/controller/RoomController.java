@@ -11,9 +11,11 @@ import org.example.roomservice.model.RoomRole;
 import org.example.roomservice.model.UserRoom;
 import org.example.roomservice.service.RoomService;
 import org.example.roomservice.service.UserRoomService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,7 @@ public class RoomController {
 
     // Создать комнату
     @PostMapping
+    @PreAuthorize("hasRole('MODERATOR')")
     public RoomListDto createRoom(@RequestBody RoomListDto dto) {
         Room room = roomService.createRoom(
                 dto.getDirectionId(),
@@ -60,24 +63,29 @@ public class RoomController {
 
     // Удалить комнату
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MODERATOR')")
     public void deleteRoom(@PathVariable Long id) {
         roomService.deleteRoom(id);
     }
 
     // Вступить в комнату
     @PostMapping("/{roomId}/join")
+    @PreAuthorize("hasRole('USER')")
     public UserRoomDto joinRoom(
             @PathVariable Long roomId,
-            @RequestParam Long userId,
-            @RequestParam(required = false) RoomRole role
+            @RequestParam(required = false) RoomRole role,
+            Principal principal
     ) {
+        Long userId = Long.valueOf(principal.getName());
         UserRoom userRoom = userRoomService.joinRoom(userId, roomId, role);
         return userRoomMapper.toDto(userRoom);
     }
 
     // Выйти из комнаты
     @PostMapping("/{roomId}/leave")
-    public void leaveRoom(@PathVariable Long roomId, @RequestParam Long userId) {
+    @PreAuthorize("hasRole('USER')")
+    public void leaveRoom(@PathVariable Long roomId, Principal principal) {
+        Long userId = Long.valueOf(principal.getName());
         userRoomService.leaveRoom(userId, roomId);
     }
 

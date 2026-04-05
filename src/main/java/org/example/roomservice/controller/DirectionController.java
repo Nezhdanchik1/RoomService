@@ -5,6 +5,7 @@ import org.example.roomservice.dto.DirectionDto;
 import org.example.roomservice.mapper.DirectionMapper;
 import org.example.roomservice.model.Direction;
 import org.example.roomservice.service.DirectionService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class DirectionController {
     private final DirectionMapper directionMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('MODERATOR')")
     public DirectionDto createDirection(@RequestBody DirectionDto dto) {
         Direction direction = directionService.createDirection(dto.getName(), dto.getDescription());
         return directionMapper.toDto(direction);
@@ -33,6 +35,7 @@ public class DirectionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MODERATOR')")
     public void deleteDirection(@PathVariable Long id) {
         directionService.deleteDirection(id);
     }
