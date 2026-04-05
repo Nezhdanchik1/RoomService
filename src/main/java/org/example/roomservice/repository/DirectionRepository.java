@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface DirectionRepository extends JpaRepository<Direction, Long> {
 
-//    Optional<Direction> findByName(String name);
+    Optional<Direction> findBySlug(String slug);
 
     boolean existsByName(String name);
 }

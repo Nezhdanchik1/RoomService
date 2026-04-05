@@ -19,12 +19,13 @@ public class DirectionService {
 
     private final DirectionRepository directionRepository;
 
-    public Direction createDirection(String name, String description) {
+    public Direction createDirection(String name, String slug, String description) {
         if (directionRepository.existsByName(name)) {
             throw new AlreadyExistsException("Direction with name " + name + " already exists");
         }
         Direction direction = Direction.builder()
                 .name(name)
+                .slug(slug)
                 .description(description)
                 .build();
         return directionRepository.save(direction);
@@ -39,9 +40,14 @@ public class DirectionService {
                 .orElseThrow(() -> new NotFoundException("Direction not found with id: " + id));
     }
 
-    public void deleteDirection(Long id) {
-        Direction direction = getDirectionById(id);
-        if (!direction.getRooms().isEmpty()) {
+    public Direction getDirectionBySlug(String slug) {
+        return directionRepository.findBySlug(slug)
+                .orElseThrow(() -> new NotFoundException("Direction not found with slug: " + slug));
+    }
+
+    public void deleteDirection(String slug) {
+        Direction direction = getDirectionBySlug(slug);
+        if (direction.getRooms() != null && !direction.getRooms().isEmpty()) {
             throw new ForbiddenException("Cannot delete direction with existing rooms");
         }
         directionRepository.delete(direction);

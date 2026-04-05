@@ -9,3 +9,9 @@ databaseChangeLog:
       file: db/changelog/004-create-tags-table.yaml
   - include:
       file: db/changelog/005-seed-data.yaml
+  - include:
+      file: db/changelog/006-add-members-count-to-rooms.yaml
+  - include:
+      file: db/changelog/007-add-slugs-to-directions-and-rooms.yaml
+  - include:
+      file: db/changelog/008-reseed-with-slugs.yaml

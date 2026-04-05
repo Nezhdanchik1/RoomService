@@ -13,11 +13,18 @@ public class RabbitConfig {
 
     public static final String EXCHANGE = "room-events-exchange";
     public static final String QUEUE_JOIN = "room-join-queue";
+    public static final String QUEUE_LEAVE = "room-leave-queue";
     public static final String ROUTING_KEY_JOIN = "room.user.joined";
+    public static final String ROUTING_KEY_LEAVE = "room.user.left";
 
     @Bean
     public Queue joinQueue() {
         return new Queue(QUEUE_JOIN);
+    }
+
+    @Bean
+    public Queue leaveQueue() {
+        return new Queue(QUEUE_LEAVE);
     }
 
     @Bean
@@ -28,6 +35,11 @@ public class RabbitConfig {
     @Bean
     public Binding bindingJoin(Queue joinQueue, TopicExchange roomExchange) {
         return BindingBuilder.bind(joinQueue).to(roomExchange).with(ROUTING_KEY_JOIN);
+    }
+
+    @Bean
+    public Binding bindingLeave(Queue leaveQueue, TopicExchange roomExchange) {
+        return BindingBuilder.bind(leaveQueue).to(roomExchange).with(ROUTING_KEY_LEAVE);
     }
 
     @Bean

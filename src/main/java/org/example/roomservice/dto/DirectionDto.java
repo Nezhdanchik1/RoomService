@@ -10,5 +10,6 @@ import lombok.*;
 public class DirectionDto {
     private Long id;
     private String name;
+    private String slug;
     private String description;
 }

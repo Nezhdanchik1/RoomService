@@ -10,7 +10,6 @@ import org.example.roomservice.dto.UserPresenceDto;
 import org.example.roomservice.exception.AlreadyExistsException;
 import org.example.roomservice.exception.NotFoundException;
 import org.example.roomservice.mapper.RoomMapper;
-import org.example.roomservice.mapper.RoomMapperImpl;
 import org.example.roomservice.model.Direction;
 import org.example.roomservice.model.Room;
 import org.example.roomservice.repository.DirectionRepository;
@@ -39,8 +38,8 @@ public class RoomService {
     private final TagRepository tagRepository;
     private final RoomMapper roomMapper;
 
-    public Room createRoom(Long directionId, String name, String description, boolean isPrivate, java.util.Set<String> tagNames) {
-        Direction direction = directionService.getDirectionById(directionId);
+    public Room createRoom(String directionSlug, String name, String slug, String description, boolean isPrivate, java.util.Set<String> tagNames) {
+        Direction direction = directionService.getDirectionBySlug(directionSlug);
 
         if (roomRepository.existsByDirectionAndName(direction, name)) {
             throw new AlreadyExistsException("Room with name '" + name + "' already exists in this direction");
@@ -58,6 +57,7 @@ public class RoomService {
         Room room = Room.builder()
                 .direction(direction)
                 .name(name)
+                .slug(slug)
                 .description(description)
                 .isPrivate(isPrivate)
                 .tags(tags)
@@ -66,11 +66,11 @@ public class RoomService {
         return roomRepository.save(room);
     }
 
-    public OneRoomDto getRoomById(Long id) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Room not found with id: " + id));
+    public OneRoomDto getRoomBySlug(String slug) {
+        Room room = roomRepository.findBySlug(slug)
+                .orElseThrow(() -> new NotFoundException("Room not found with slug: " + slug));
 
-        List<Long> userIds = userRoomRepository.findUserIdsByRoomId(id);
+        List<Long> userIds = userRoomRepository.findUserIdsByRoomId(room.getId());
         PresenceResponse presence = userPresenceClient.getUsersPresence(userIds);
 
         Map<Long, Boolean> onlineMap =
@@ -88,17 +88,11 @@ public class RoomService {
                         .build())
                 .toList();
 
-        return OneRoomDto.builder()
-                .id(room.getId())
-                .directionId(room.getDirection().getId())
-                .name(room.getName())
-                .description(room.getDescription())
-                .isPrivate(room.getIsPrivate())
-                .participantsCount((long) userIds.size())
-                .onlineCount((long) presence.getOnline_count())
-                .members(members)
-                .tags(room.getTags().stream().map(org.example.roomservice.model.Tag::getName).collect(java.util.stream.Collectors.toSet()))
-                .build();
+        OneRoomDto dto = roomMapper.toOneRoomDto(room);
+        dto.setParticipantsCount((long) room.getMembersCount());
+        dto.setOnlineCount((long) presence.getOnline_count());
+        dto.setMembers(members);
+        return dto;
     }
 
     public Room getRoom(Long id) {
@@ -106,8 +100,13 @@ public class RoomService {
                 .orElseThrow(() -> new NotFoundException("Room not found with id: " + id));
     }
 
-    public Mono<List<RoomListDto>> getRoomsByDirection(Long directionId) {
-        Direction direction = directionRepository.getReferenceById(directionId);
+    public Room getRoom(String slug) {
+        return roomRepository.findBySlug(slug)
+                .orElseThrow(() -> new NotFoundException("Room not found with slug: " + slug));
+    }
+
+    public Mono<List<RoomListDto>> getRoomsByDirection(String directionSlug) {
+        Direction direction = directionService.getDirectionBySlug(directionSlug);
 
         List<Room> rooms = roomRepository.findRoomsByDirection(direction);
 
@@ -115,35 +114,14 @@ public class RoomService {
                 .map(Room::getId)
                 .toList();
 
-        Map<Long, Long> participants = userRoomRepository
-                .countParticipants(ids)
-                .stream()
-                .collect(Collectors.toMap(
-                        r -> (Long) r[0],
-                        r -> (Long) r[1]
-                ));
-
         Mono<Map<Long, Long>> postsMono = contentClient.getPostsCount(ids);
         return postsMono.map(posts -> {
 
             return rooms.stream().map(room -> {
 
-                RoomListDto dto = new RoomListDto();
-
-                dto.setId(room.getId());
-                dto.setName(room.getName());
-                dto.setDescription(room.getDescription());
-                dto.setDirectionId(room.getDirection().getId());
-                dto.setIsPrivate(room.getIsPrivate());
-                dto.setTags(room.getTags().stream().map(org.example.roomservice.model.Tag::getName).collect(java.util.stream.Collectors.toSet()));
-
-                dto.setParticipantsCount(
-                        participants.getOrDefault(room.getId(), 0L)
-                );
-
-                dto.setPostsCount(
-                        posts.getOrDefault(room.getId(), 0L)
-                );
+                RoomListDto dto = roomMapper.toDto(room);
+                dto.setParticipantsCount((long) room.getMembersCount());
+                dto.setPostsCount(posts.getOrDefault(room.getId(), 0L));
 
                 return dto;
 
@@ -160,7 +138,8 @@ public class RoomService {
                 .toList();
     }
 
-    public void deleteRoom(Long id) {
-        roomRepository.deleteById(id);
+    public void deleteRoom(String slug) {
+        Room room = getRoom(slug);
+        roomRepository.delete(room);
     }
 }

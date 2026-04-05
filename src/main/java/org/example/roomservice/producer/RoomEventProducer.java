@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.roomservice.config.RabbitConfig;
 import org.example.roomservice.dto.event.UserJoinedRoomEvent;
+import org.example.roomservice.dto.event.UserLeftRoomEvent;
 import org.example.roomservice.model.RoomRole;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,16 @@ public class RoomEventProducer {
 
         log.info("Sending user joined event to RabbitMQ: {}", event);
         rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY_JOIN, event);
+    }
+
+    public void sendUserLeftEvent(Long userId, Long roomId) {
+        UserLeftRoomEvent event = UserLeftRoomEvent.builder()
+                .userId(userId)
+                .roomId(roomId)
+                .leftAt(LocalDateTime.now())
+                .build();
+
+        log.info("Sending user left event to RabbitMQ: {}", event);
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY_LEAVE, event);
     }
 }

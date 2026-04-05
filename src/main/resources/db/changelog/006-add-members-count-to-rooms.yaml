@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-add-members-count-to-rooms
+      author: antigravity
+      changes:
+        - addColumn:
+            tableName: rooms
+            columns:
+              - column:
+                  name: members_count
+                  type: integer
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false

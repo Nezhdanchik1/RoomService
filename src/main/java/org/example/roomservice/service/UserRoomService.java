@@ -8,7 +8,6 @@ import org.example.roomservice.model.RoomRole;
 import org.example.roomservice.model.UserRoom;
 import org.example.roomservice.model.UserRoomId;
 import org.example.roomservice.repository.UserRoomRepository;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,9 +24,9 @@ public class UserRoomService {
     private final org.example.roomservice.producer.RoomEventProducer roomEventProducer;
 
     // Вступление пользователя
-    public UserRoom joinRoom(Long userId, Long roomId, RoomRole role) {
-        Room room = roomService.getRoom(roomId);
-        UserRoomId id = new UserRoomId(userId, roomId);
+    public UserRoom joinRoom(Long userId, String roomSlug, RoomRole role) {
+        Room room = roomService.getRoom(roomSlug);
+        UserRoomId id = new UserRoomId(userId, room.getId());
 
         if (userRoomRepository.existsById(id)) {
             throw new AlreadyExistsException("User already in room");
@@ -41,24 +40,25 @@ public class UserRoomService {
 
         UserRoom saved = userRoomRepository.save(userRoom);
 
-        roomEventProducer.sendUserJoinedEvent(userId, roomId, role);
+        roomEventProducer.sendUserJoinedEvent(userId, room.getId(), role);
 
         return saved;
     }
 
     // Выйти из комнаты
-    public void leaveRoom(Long userId, Long roomId) {
-        UserRoomId id = new UserRoomId(userId, roomId);
+    public void leaveRoom(Long userId, String roomSlug) {
+        Room room = roomService.getRoom(roomSlug);
+        UserRoomId id = new UserRoomId(userId, room.getId());
         UserRoom userRoom = userRoomRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not in room"));
 
         userRoomRepository.delete(userRoom);
-//        eventPublisher.publishEvent(new UserLeftRoomEvent(this, userId, roomId));
+        roomEventProducer.sendUserLeftEvent(userId, room.getId());
     }
 
     // Получить участников комнаты
-    public List<UserRoom> getMembers(Long roomId) {
-        Room room = roomService.getRoom(roomId);
+    public List<UserRoom> getMembers(String roomSlug) {
+        Room room = roomService.getRoom(roomSlug);
         return userRoomRepository.findByRoom(room);
     }
 

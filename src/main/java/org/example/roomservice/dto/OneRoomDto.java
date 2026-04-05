@@ -13,7 +13,9 @@ import java.util.Set;
 public class OneRoomDto {
     private Long id;
     private Long directionId;
+    private String directionSlug;
     private String name;
+    private String slug;
     private String description;
 
     private Boolean isPrivate = false;

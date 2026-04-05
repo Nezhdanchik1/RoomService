@@ -1,6 +1,5 @@
 package org.example.roomservice.mapper;
 
-import org.example.roomservice.dto.OneRoomDto;
 import org.example.roomservice.dto.RoomListDto;
 import org.example.roomservice.model.Room;
 import org.example.roomservice.model.Tag;

@@ -22,7 +22,7 @@ public class DirectionController {
     @PostMapping
     @PreAuthorize("hasRole('MODERATOR')")
     public DirectionDto createDirection(@RequestBody DirectionDto dto) {
-        Direction direction = directionService.createDirection(dto.getName(), dto.getDescription());
+        Direction direction = directionService.createDirection(dto.getName(), dto.getSlug(), dto.getDescription());
         return directionMapper.toDto(direction);
     }
 
@@ -34,9 +34,9 @@ public class DirectionController {
                 .collect(Collectors.toList());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{slug}")
     @PreAuthorize("hasRole('MODERATOR')")
-    public void deleteDirection(@PathVariable Long id) {
-        directionService.deleteDirection(id);
+    public void deleteDirection(@PathVariable String slug) {
+        directionService.deleteDirection(slug);
     }
 }

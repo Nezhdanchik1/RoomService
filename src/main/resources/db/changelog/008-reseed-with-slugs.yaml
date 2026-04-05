@@ -1,0 +1,128 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-reseed-with-slugs
+      author: antigravity
+      changes:
+        # 1. Очистка таблиц (в порядке, учитывающем FK)
+        - delete: { tableName: user_rooms }
+        - delete: { tableName: room_tags }
+        - delete: { tableName: rooms }
+        - delete: { tableName: directions }
+
+        # 2. Наполнение Directions
+        - insert:
+            tableName: directions
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "Frontend" }
+              - column: { name: slug, value: "frontend" }
+              - column: { name: description, value: "Client-side development with React, Vue, Angular, etc." }
+        - insert:
+            tableName: directions
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "Backend" }
+              - column: { name: slug, value: "backend" }
+              - column: { name: description, value: "Server-side development with Java, Python, Go, Node.js, etc." }
+        - insert:
+            tableName: directions
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: name, value: "DevOps" }
+              - column: { name: slug, value: "devops" }
+              - column: { name: description, value: "Infrastructure, CI/CD, Cloud, and automation." }
+
+        # 3. Наполнение Rooms (Frontend)
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "React & Next.js" }
+              - column: { name: slug, value: "react-nextjs" }
+              - column: { name: description, value: "Discuss modern frontend frameworks." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "Vue.js & Nuxt" }
+              - column: { name: slug, value: "vue-nuxt" }
+              - column: { name: description, value: "Vue, Nuxt, and Vite ecosystems." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "Angular Hub" }
+              - column: { name: slug, value: "angular-hub" }
+              - column: { name: description, value: "Enterprise frontend with Angular." }
+
+        # 4. Наполнение Rooms (Backend)
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "Java & Spring Boot" }
+              - column: { name: slug, value: "java-spring" }
+              - column: { name: description, value: "JVM, Spring, and enterprise Java." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "Python Backend" }
+              - column: { name: slug, value: "python-backend" }
+              - column: { name: description, value: "Django, FastAPI, and data services." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 9 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "Golang Devs" }
+              - column: { name: slug, value: "golang-devs" }
+              - column: { name: description, value: "High-performance services with Go." }
+
+        # 5. Наполнение Rooms (DevOps)
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: direction_id, valueNumeric: 3 }
+              - column: { name: name, value: "Docker & K8s" }
+              - column: { name: slug, value: "docker-k8s" }
+              - column: { name: description, value: "Containerization and orchestration." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 12 }
+              - column: { name: direction_id, valueNumeric: 3 }
+              - column: { name: name, value: "Cloud AWS/Azure" }
+              - column: { name: slug, value: "cloud-computing" }
+              - column: { name: description, value: "Cloud provider services." }
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 13 }
+              - column: { name: direction_id, valueNumeric: 3 }
+              - column: { name: name, value: "CI/CD Automation" }
+              - column: { name: slug, value: "cicd-automation" }
+              - column: { name: description, value: "GitHub Actions, GitLab CI, and Jenkins." }
+
+        # Восстановление связей тегов (для примера возьмем основные)
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 1 }
+              - column: { name: tag_id, valueNumeric: 1 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 2 }
+              - column: { name: tag_id, valueNumeric: 3 }
+        - insert:
+            tableName: room_tags
+            columns:
+              - column: { name: room_id, valueNumeric: 3 }
+              - column: { name: tag_id, valueNumeric: 5 }

@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-add-slugs-to-directions-and-rooms
+      author: antigravity
+      changes:
+        # 1. Добавляем колонки без NOT NULL
+        - addColumn:
+            tableName: directions
+            columns:
+              - column:
+                  name: slug
+                  type: varchar(255)
+        - addColumn:
+            tableName: rooms
+            columns:
+              - column:
+                  name: slug
+                  type: varchar(255)
+
+        # 2. Наполняем существующие данные через нативный SQL (для PostgreSQL)
+        - sql:
+            dbms: postgresql
+            sql: UPDATE directions SET slug = 'dir-' || id WHERE slug IS NULL;
+        - sql:
+            dbms: postgresql
+            sql: UPDATE rooms SET slug = 'room-' || id WHERE slug IS NULL;
+
+        # 3. Теперь добавляем ограничение UNIQUE
+        - addUniqueConstraint:
+            tableName: directions
+            columnNames: slug
+            constraintName: uq_directions_slug
+        - addUniqueConstraint:
+            tableName: rooms
+            columnNames: slug
+            constraintName: uq_rooms_slug
+
+        # 4. И наконец, добавляем NOT NULL
+        - addNotNullConstraint:
+            tableName: directions
+            columnName: slug
+            columnDataType: varchar(255)
+        - addNotNullConstraint:
+            tableName: rooms
+            columnName: slug
+            columnDataType: varchar(255)

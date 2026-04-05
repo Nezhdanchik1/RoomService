@@ -26,6 +26,9 @@ public class Room {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false, unique = true)
+    private String slug;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -34,9 +37,15 @@ public class Room {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private Integer membersCount = 0;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        if (this.slug == null || this.slug.isEmpty()) {
+            this.slug = this.name.toLowerCase().replaceAll("[^a-z0-9]", "-").replaceAll("-+", "-").replaceAll("^-|-$", "");
+        }
     }
 
     @ManyToMany

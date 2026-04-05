@@ -34,8 +34,9 @@ public class RoomController {
     @PreAuthorize("hasRole('MODERATOR')")
     public RoomListDto createRoom(@RequestBody RoomListDto dto) {
         Room room = roomService.createRoom(
-                dto.getDirectionId(),
+                dto.getDirectionSlug(),
                 dto.getName(),
+                dto.getSlug(),
                 dto.getDescription(),
                 dto.getIsPrivate(),
                 dto.getTags()
@@ -49,50 +50,50 @@ public class RoomController {
         return roomService.findRoomsByTag(tagName);
     }
 
-    // Получить комнату по id
-    @GetMapping("/{id}")
-    public OneRoomDto getRoom(@PathVariable Long id) {
-        return roomService.getRoomById(id);
+    // Получить комнату по слагу
+    @GetMapping("/{slug}")
+    public OneRoomDto getRoom(@PathVariable String slug) {
+        return roomService.getRoomBySlug(slug);
     }
 
     // Получить комнаты направления
-    @GetMapping("/direction/{directionId}")
-    public Mono<List<RoomListDto>> getRoomsByDirection(@PathVariable Long directionId) {
-        return roomService.getRoomsByDirection(directionId);
+    @GetMapping("/direction/{directionSlug}")
+    public Mono<List<RoomListDto>> getRoomsByDirection(@PathVariable String directionSlug) {
+        return roomService.getRoomsByDirection(directionSlug);
     }
 
     // Удалить комнату
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{slug}")
     @PreAuthorize("hasRole('MODERATOR')")
-    public void deleteRoom(@PathVariable Long id) {
-        roomService.deleteRoom(id);
+    public void deleteRoom(@PathVariable String slug) {
+        roomService.deleteRoom(slug);
     }
 
     // Вступить в комнату
-    @PostMapping("/{roomId}/join")
+    @PostMapping("/{roomSlug}/join")
     @PreAuthorize("hasRole('USER')")
     public UserRoomDto joinRoom(
-            @PathVariable Long roomId,
+            @PathVariable String roomSlug,
             @RequestParam(required = false) RoomRole role,
             Principal principal
     ) {
         Long userId = Long.valueOf(principal.getName());
-        UserRoom userRoom = userRoomService.joinRoom(userId, roomId, role);
+        UserRoom userRoom = userRoomService.joinRoom(userId, roomSlug, role);
         return userRoomMapper.toDto(userRoom);
     }
 
     // Выйти из комнаты
-    @PostMapping("/{roomId}/leave")
+    @PostMapping("/{roomSlug}/leave")
     @PreAuthorize("hasRole('USER')")
-    public void leaveRoom(@PathVariable Long roomId, Principal principal) {
+    public void leaveRoom(@PathVariable String roomSlug, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
-        userRoomService.leaveRoom(userId, roomId);
+        userRoomService.leaveRoom(userId, roomSlug);
     }
 
     // Получить участников комнаты
-    @GetMapping("/{roomId}/members")
-    public List<UserRoomDto> getMembers(@PathVariable Long roomId) {
-        return userRoomService.getMembers(roomId)
+    @GetMapping("/{roomSlug}/members")
+    public List<UserRoomDto> getMembers(@PathVariable String roomSlug) {
+        return userRoomService.getMembers(roomSlug)
                 .stream()
                 .map(userRoomMapper::toDto)
                 .collect(Collectors.toList());
