@@ -7,6 +7,7 @@ import org.example.roomservice.model.Room;
 import org.example.roomservice.model.RoomRole;
 import org.example.roomservice.model.UserRoom;
 import org.example.roomservice.model.UserRoomId;
+import org.example.roomservice.repository.RoomRepository;
 import org.example.roomservice.repository.UserRoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class UserRoomService {
 
     private final UserRoomRepository userRoomRepository;
+    private final RoomRepository roomRepository;
     private final RoomService roomService;
     private final org.example.roomservice.producer.RoomEventProducer roomEventProducer;
 
@@ -40,6 +42,9 @@ public class UserRoomService {
 
         UserRoom saved = userRoomRepository.save(userRoom);
 
+        // Синхронное обновление счетчика для надежности
+        roomRepository.incrementMembersCount(room.getId());
+
         roomEventProducer.sendUserJoinedEvent(userId, room.getId(), role);
 
         return saved;
@@ -53,6 +58,10 @@ public class UserRoomService {
                 .orElseThrow(() -> new NotFoundException("User not in room"));
 
         userRoomRepository.delete(userRoom);
+
+        // Синхронное обновление счетчика
+        roomRepository.decrementMembersCount(room.getId());
+
         roomEventProducer.sendUserLeftEvent(userId, room.getId());
     }
 
@@ -69,4 +78,4 @@ public class UserRoomService {
                 .map(UserRoom::getRoom)
                 .collect(Collectors.toList());
     }
-}
+}
