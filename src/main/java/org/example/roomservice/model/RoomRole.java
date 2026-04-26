@@ -1,7 +1,8 @@
 package org.example.roomservice.model;
 
 public enum RoomRole {
-    MEMBER,
+    STUDENT,
     MODERATOR,
-    ADMIN
+    EXPERT,
+    ROOM_ADMIN
 }

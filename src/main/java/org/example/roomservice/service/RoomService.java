@@ -12,6 +12,7 @@ import org.example.roomservice.exception.NotFoundException;
 import org.example.roomservice.mapper.RoomMapper;
 import org.example.roomservice.model.Direction;
 import org.example.roomservice.model.Room;
+import org.example.roomservice.model.RoomRole;
 import org.example.roomservice.repository.DirectionRepository;
 import org.example.roomservice.repository.RoomRepository;
 import org.example.roomservice.repository.TagRepository;
@@ -37,8 +38,9 @@ public class RoomService {
     private final DirectionRepository directionRepository;
     private final TagRepository tagRepository;
     private final RoomMapper roomMapper;
+    private final UserRoomService userRoomService;
 
-    public Room createRoom(String directionSlug, String name, String slug, String description, boolean isPrivate, java.util.Set<String> tagNames) {
+    public Room createRoom(Long userId, String directionSlug, String name, String slug, String description, boolean isPrivate, java.util.Set<String> tagNames) {
         Direction direction = directionService.getDirectionBySlug(directionSlug);
 
         if (roomRepository.existsByDirectionAndName(direction, name)) {
@@ -63,7 +65,12 @@ public class RoomService {
                 .tags(tags)
                 .build();
 
-        return roomRepository.save(room);
+        Room savedRoom = roomRepository.save(room);
+
+        // Создатель автоматически становится ROOM_ADMIN
+        userRoomService.joinRoom(userId, savedRoom, RoomRole.ROOM_ADMIN);
+
+        return savedRoom;
     }
 
     public OneRoomDto getRoomBySlug(String slug) {

@@ -3,11 +3,9 @@ package org.example.roomservice.service;
 import lombok.RequiredArgsConstructor;
 import org.example.roomservice.exception.AlreadyExistsException;
 import org.example.roomservice.exception.NotFoundException;
-import org.example.roomservice.model.Room;
-import org.example.roomservice.model.RoomRole;
-import org.example.roomservice.model.UserRoom;
-import org.example.roomservice.model.UserRoomId;
+import org.example.roomservice.model.*;
 import org.example.roomservice.repository.RoomRepository;
+import org.example.roomservice.repository.UserDirectionRepository;
 import org.example.roomservice.repository.UserRoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +19,12 @@ import java.util.stream.Collectors;
 public class UserRoomService {
 
     private final UserRoomRepository userRoomRepository;
+    private final UserDirectionRepository userDirectionRepository;
     private final RoomRepository roomRepository;
-    private final RoomService roomService;
     private final org.example.roomservice.producer.RoomEventProducer roomEventProducer;
 
     // Вступление пользователя
-    public UserRoom joinRoom(Long userId, String roomSlug, RoomRole role) {
-        Room room = roomService.getRoom(roomSlug);
+    public UserRoom joinRoom(Long userId, Room room, RoomRole role) {
         UserRoomId id = new UserRoomId(userId, room.getId());
 
         if (userRoomRepository.existsById(id)) {
@@ -37,7 +34,7 @@ public class UserRoomService {
         UserRoom userRoom = UserRoom.builder()
                 .id(id)
                 .room(room)
-                .roomRole(role != null ? role : RoomRole.MEMBER)
+                .roomRole(role != null ? role : RoomRole.STUDENT)
                 .build();
 
         UserRoom saved = userRoomRepository.save(userRoom);
@@ -51,8 +48,7 @@ public class UserRoomService {
     }
 
     // Выйти из комнаты
-    public void leaveRoom(Long userId, String roomSlug) {
-        Room room = roomService.getRoom(roomSlug);
+    public void leaveRoom(Long userId, Room room) {
         UserRoomId id = new UserRoomId(userId, room.getId());
         UserRoom userRoom = userRoomRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not in room"));
@@ -66,8 +62,7 @@ public class UserRoomService {
     }
 
     // Получить участников комнаты
-    public List<UserRoom> getMembers(String roomSlug) {
-        Room room = roomService.getRoom(roomSlug);
+    public List<UserRoom> getMembers(Room room) {
         return userRoomRepository.findByRoom(room);
     }
 
@@ -78,4 +73,22 @@ public class UserRoomService {
                 .map(UserRoom::getRoom)
                 .collect(Collectors.toList());
     }
-}
+
+    // Получить эффективную роль пользователя в комнате
+    public RoomRole getEffectiveRole(Long userId, Room room) {
+        UserRoom userRoom = userRoomRepository.findById(new UserRoomId(userId, room.getId())).orElse(null);
+
+        // 1. Если пользователь ROOM_ADMIN (Уровень 4)
+        if (userRoom != null && userRoom.getRoomRole() == RoomRole.ROOM_ADMIN) {
+            return RoomRole.ROOM_ADMIN;
+        }
+
+        // 2. Если пользователь эксперт в направлении (Уровень 3)
+        if (userDirectionRepository.existsById(new UserDirectionId(userId, room.getDirection().getId()))) {
+            return RoomRole.EXPERT;
+        }
+
+        // 3. Остальные роли из UserRoom (MODERATOR, STUDENT)
+        return userRoom != null ? userRoom.getRoomRole() : null;
+    }
+}

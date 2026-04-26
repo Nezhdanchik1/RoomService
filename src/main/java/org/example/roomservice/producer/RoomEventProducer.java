@@ -22,7 +22,7 @@ public class RoomEventProducer {
         UserJoinedRoomEvent event = UserJoinedRoomEvent.builder()
                 .userId(userId)
                 .roomId(roomId)
-                .userRole(role != null ? role.name() : RoomRole.MEMBER.name())
+                .userRole(role != null ? role.name() : RoomRole.STUDENT.name())
                 .joinedAt(LocalDateTime.now())
                 .build();
 
