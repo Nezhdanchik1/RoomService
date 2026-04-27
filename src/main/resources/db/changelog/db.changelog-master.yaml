@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/007-add-slugs-to-directions-and-rooms.yaml
   - include:
       file: db/changelog/008-reseed-with-slugs.yaml
+  - include:
+      file: db/changelog/009-add-test-rooms.yaml

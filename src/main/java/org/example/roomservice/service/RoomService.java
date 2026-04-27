@@ -149,4 +149,10 @@ public class RoomService {
         Room room = getRoom(slug);
         roomRepository.delete(room);
     }
+
+    public List<RoomListDto> getAllRooms() {
+        return roomRepository.findAll().stream()
+                .map(roomMapper::toDto)
+                .toList();
+    }
 }

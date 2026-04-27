@@ -1,0 +1,72 @@
+
+databaseChangeLog:
+  - changeSet:
+      id: 009-add-test-rooms-v3
+      author: antigravity
+      changes:
+        # 1. Добавляем новое направление (Data Analytics), если его еще нет
+        - insert:
+            tableName: directions
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: name, value: "Data Analytics" }
+              - column: { name: slug, value: "data-analytics" }
+              - column: { name: description, value: "Data science, analysis, and visualization." }
+          # Добавляем условие: выполнять только если ID 4 еще не существует
+          preConditions:
+            - onFail: CONTINUE
+            - sqlCheck:
+                expectedResult: 0
+                sql: SELECT COUNT(*) FROM directions WHERE id = 4
+
+        # 2. Добавляем 3 тестовые комнаты
+        # Backend Lab
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 101 }
+              - column: { name: direction_id, valueNumeric: 2 }
+              - column: { name: name, value: "Backend Lab" }
+              - column: { name: slug, value: "backend-lab" }
+              - column: { name: description, value: "Test room for Backend developers." }
+              - column: { name: is_private, valueBoolean: false }
+              - column: { name: members_count, valueNumeric: 0 }
+          preConditions:
+            - onFail: CONTINUE
+            - sqlCheck:
+                expectedResult: 0
+                sql: SELECT COUNT(*) FROM rooms WHERE id = 101
+
+        # Frontend Lab
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 102 }
+              - column: { name: direction_id, valueNumeric: 1 }
+              - column: { name: name, value: "Frontend Lab" }
+              - column: { name: slug, value: "frontend-lab" }
+              - column: { name: description, value: "Test room for Frontend developers." }
+              - column: { name: is_private, valueBoolean: false }
+              - column: { name: members_count, valueNumeric: 0 }
+          preConditions:
+            - onFail: CONTINUE
+            - sqlCheck:
+                expectedResult: 0
+                sql: SELECT COUNT(*) FROM rooms WHERE id = 102
+
+        # Data Analytics Lab
+        - insert:
+            tableName: rooms
+            columns:
+              - column: { name: id, valueNumeric: 103 }
+              - column: { name: direction_id, valueNumeric: 4 }
+              - column: { name: name, value: "Data Analytics Lab" }
+              - column: { name: slug, value: "data-analytics-lab" }
+              - column: { name: description, value: "Test room for Data Analysts." }
+              - column: { name: is_private, valueBoolean: false }
+              - column: { name: members_count, valueNumeric: 0 }
+          preConditions:
+            - onFail: CONTINUE
+            - sqlCheck:
+                expectedResult: 0
+                sql: SELECT COUNT(*) FROM rooms WHERE id = 103

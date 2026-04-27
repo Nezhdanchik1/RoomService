@@ -112,4 +112,20 @@ public class RoomController {
                 .collect(Collectors.toList());
     }
 
+    @PutMapping("/{roomSlug}/members/{userId}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserRoomDto updateMemberRole(
+            @PathVariable String roomSlug,
+            @PathVariable Long userId,
+            @RequestParam RoomRole role
+    ) {
+        UserRoom updated = userRoomService.updateUserRole(userId, roomSlug, role);
+        return userRoomMapper.toDto(updated);
+    }
+
+    @GetMapping("/all")
+    public List<RoomListDto> getAllRooms() {
+        return roomService.getAllRooms();
+    }
+
 }
