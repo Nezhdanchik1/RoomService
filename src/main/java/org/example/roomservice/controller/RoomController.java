@@ -119,7 +119,8 @@ public class RoomController {
             @PathVariable Long userId,
             @RequestParam RoomRole role
     ) {
-        UserRoom updated = userRoomService.updateUserRole(userId, roomSlug, role);
+        Room room = roomService.getRoom(roomSlug);
+        UserRoom updated = userRoomService.updateUserRole(userId, room, role);
         return userRoomMapper.toDto(updated);
     }
 

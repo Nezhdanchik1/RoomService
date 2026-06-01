@@ -1,3 +1,9 @@
+# Secrets — never commit
+.env
+.env.local
+.env.*.local
+!.env.example
+
 HELP.md
 .gradle
 build/
@@ -35,3 +41,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Logs & editor backups
+*.log
+build_log.txt
+*~
+*.java~
