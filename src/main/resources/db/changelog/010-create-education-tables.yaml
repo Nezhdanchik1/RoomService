@@ -1,0 +1,320 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-create-education-tables
+      author: antigravity
+      changes:
+        # 1. skills
+        - createTable:
+            tableName: skills
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: room_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: requires_expert_validation
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_skills_room
+            baseTableName: skills
+            baseColumnNames: room_id
+            referencedTableName: rooms
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # 2. user_skills
+        - createTable:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: skill_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: user_skills
+            columnNames: user_id, skill_id
+            constraintName: pk_user_skills
+
+        - addForeignKeyConstraint:
+            constraintName: fk_user_skills_skill
+            baseTableName: user_skills
+            baseColumnNames: skill_id
+            referencedTableName: skills
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # 3. assignments
+        - createTable:
+            tableName: assignments
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: skill_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_assignments_skill
+            baseTableName: assignments
+            baseColumnNames: skill_id
+            referencedTableName: skills
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # 4. rubrics
+        - createTable:
+            tableName: rubrics
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: assignment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: criterion_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: max_points
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+
+        - addForeignKeyConstraint:
+            constraintName: fk_rubrics_assignment
+            baseTableName: rubrics
+            baseColumnNames: assignment_id
+            referencedTableName: assignments
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # 5. submissions
+        - createTable:
+            tableName: submissions
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: assignment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: student_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: solution_text
+                  type: TEXT
+              - column:
+                  name: file_url
+                  type: VARCHAR(255)
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_submissions_assignment
+            baseTableName: submissions
+            baseColumnNames: assignment_id
+            referencedTableName: assignments
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # 6. reviews
+        - createTable:
+            tableName: reviews
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: submission_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reviewer_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_reviews_submission
+            baseTableName: reviews
+            baseColumnNames: submission_id
+            referencedTableName: submissions
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # 7. review_grades
+        - createTable:
+            tableName: review_grades
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: review_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rubric_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: score
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: VARCHAR(255)
+
+        - addForeignKeyConstraint:
+            constraintName: fk_review_grades_review
+            baseTableName: review_grades
+            baseColumnNames: review_id
+            referencedTableName: reviews
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            constraintName: fk_review_grades_rubric
+            baseTableName: review_grades
+            baseColumnNames: rubric_id
+            referencedTableName: rubrics
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+      rollback:
+        - dropTable:
+            tableName: review_grades
+        - dropTable:
+            tableName: reviews
+        - dropTable:
+            tableName: submissions
+        - dropTable:
+            tableName: rubrics
+        - dropTable:
+            tableName: assignments
+        - dropTable:
+            tableName: user_skills
+        - dropTable:
+            tableName: skills

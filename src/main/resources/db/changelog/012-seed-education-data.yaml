@@ -1,0 +1,335 @@
+databaseChangeLog:
+  - changeSet:
+      id: 012-create-user-directions-table
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: user_directions
+      changes:
+        - createTable:
+            tableName: user_directions
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: direction_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: assigned_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: user_directions
+            columnNames: user_id, direction_id
+            constraintName: pk_user_directions
+        - addForeignKeyConstraint:
+            constraintName: fk_user_directions_direction
+            baseTableName: user_directions
+            baseColumnNames: direction_id
+            referencedTableName: directions
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+  - changeSet:
+      id: 012-seed-education-data-once
+      author: antigravity
+      validCheckSum:
+        - "9:5597678b37ca12d6db348420e723d4b8"
+        - "9:89b4b361468144567aeb600b8d3ac7af"
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: "SELECT count(*) FROM skills"
+      changes:
+
+        # 1. Привязка экспертов (пользователь 3 - эксперт для Frontend=1 и Backend=2)
+        - sql:
+            sql: "INSERT INTO user_directions (user_id, direction_id) VALUES (3, 1) ON CONFLICT (user_id, direction_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_directions (user_id, direction_id) VALUES (3, 2) ON CONFLICT (user_id, direction_id) DO NOTHING;"
+
+        # 2. Наполнение навыков (Skills)
+        # Интеграция Spring Security (комната 101 - Backend Lab)
+        - insert:
+            tableName: skills
+            columns:
+              - column: { name: id, valueNumeric: 201 }
+              - column: { name: room_id, valueNumeric: 101 }
+              - column: { name: name, value: "Интеграция Spring Security" }
+              - column: { name: description, value: "Настройка аутентификации, авторизации и защиты REST эндпоинтов с использованием JWT." }
+              - column: { name: requires_expert_validation, valueBoolean: true }
+        # Маршрутизация в React (комната 102 - Frontend Lab)
+        - insert:
+            tableName: skills
+            columns:
+              - column: { name: id, valueNumeric: 202 }
+              - column: { name: room_id, valueNumeric: 102 }
+              - column: { name: name, value: "Маршрутизация в React" }
+              - column: { name: description, value: "Настройка клиентской маршрутизации с использованием React Router, включая вложенные и приватные роуты." }
+              - column: { name: requires_expert_validation, valueBoolean: false }
+        # Развертывание Docker (комната 103 - DevOps Lab)
+        - insert:
+            tableName: skills
+            columns:
+              - column: { name: id, valueNumeric: 203 }
+              - column: { name: room_id, valueNumeric: 103 }
+              - column: { name: name, value: "Развертывание Docker" }
+              - column: { name: description, value: "Контейнеризация веб-приложений, написание эффективных Dockerfile и настройка мульти-контейнерных сред." }
+              - column: { name: requires_expert_validation, valueBoolean: true }
+        # Управление состоянием React (комната 102 - Frontend Lab)
+        - insert:
+            tableName: skills
+            columns:
+              - column: { name: id, valueNumeric: 204 }
+              - column: { name: room_id, valueNumeric: 102 }
+              - column: { name: name, value: "Управление состоянием React" }
+              - column: { name: description, value: "Архитектура состояний в сложных React-приложениях с использованием Zustand или Redux Toolkit." }
+              - column: { name: requires_expert_validation, valueBoolean: false }
+        # Проектирование БД (JPA/Hibernate) (комната 101 - Backend Lab)
+        - insert:
+            tableName: skills
+            columns:
+              - column: { name: id, valueNumeric: 205 }
+              - column: { name: room_id, valueNumeric: 101 }
+              - column: { name: name, value: "Проектирование БД (JPA/Hibernate)" }
+              - column: { name: description, value: "Разработка объектно-реляционной схемы бд, настройка связей, ленивой загрузки и индексов через JPA аннотации." }
+              - column: { name: requires_expert_validation, valueBoolean: true }
+        # Оркестрация Kubernetes (комната 103 - DevOps Lab)
+        - insert:
+            tableName: skills
+            columns:
+              - column: { name: id, valueNumeric: 206 }
+              - column: { name: room_id, valueNumeric: 103 }
+              - column: { name: name, value: "Оркестрация Kubernetes" }
+              - column: { name: description, value: "Создание манифестов подов, деплойментов, сервисов и ингрессов в кластере Kubernetes, управление репликацией." }
+              - column: { name: requires_expert_validation, valueBoolean: true }
+        # Настройка CI/CD (комната 103 - DevOps Lab)
+        - insert:
+            tableName: skills
+            columns:
+              - column: { name: id, valueNumeric: 207 }
+              - column: { name: room_id, valueNumeric: 103 }
+              - column: { name: name, value: "Настройка CI/CD" }
+              - column: { name: description, value: "Разработка конвейеров непрерывной сборки, авто-тестирования и доставки проектов через GitHub Actions или GitLab CI." }
+              - column: { name: requires_expert_validation, valueBoolean: false }
+
+        # 3. Наполнение заданий (Assignments)
+        # Задание 1 для навыка 201
+        - insert:
+            tableName: assignments
+            columns:
+              - column: { name: id, valueNumeric: 301 }
+              - column: { name: skill_id, valueNumeric: 201 }
+              - column: { name: title, value: "Реализация JWT аутентификации в Spring Boot" }
+              - column: { name: description, value: "Напишите REST API с защищенными эндпоинтами. Реализуйте генерацию JWT токена при авторизации и фильтр для валидации токенов в запросах." }
+        # Задание 2 для навыка 202
+        - insert:
+            tableName: assignments
+            columns:
+              - column: { name: id, valueNumeric: 302 }
+              - column: { name: skill_id, valueNumeric: 202 }
+              - column: { name: title, value: "Настройка React Router с приватными роутами" }
+              - column: { name: description, value: "Создайте SPA с несколькими страницами: главная, профиль (приватная) и логин. Приватные роуты должны перенаправлять неавторизованных пользователей на страницу логина." }
+        # Задание 3 для навыка 203
+        - insert:
+            tableName: assignments
+            columns:
+              - column: { name: id, valueNumeric: 303 }
+              - column: { name: skill_id, valueNumeric: 203 }
+              - column: { name: title, value: "Контейнеризация Spring Boot + PostgreSQL" }
+              - column: { name: description, value: "Напишите Dockerfile для Spring Boot приложения. Создайте docker-compose.yml для запуска приложения и базы данных PostgreSQL в единой сети." }
+        # Задание 4 для навыка 204
+        - insert:
+            tableName: assignments
+            columns:
+              - column: { name: id, valueNumeric: 304 }
+              - column: { name: skill_id, valueNumeric: 204 }
+              - column: { name: title, value: "Разработка Корзины Покупок на Zustand" }
+              - column: { name: description, value: "Разработайте SPA интернет-магазина. Используйте Zustand для управления глобальным состоянием корзины: добавление/удаление товаров, изменение количества, подсчет общей стоимости и сохранение состояния в LocalStorage с помощью middleware persist." }
+        # Задание 5 для навыка 205
+        - insert:
+            tableName: assignments
+            columns:
+              - column: { name: id, valueNumeric: 305 }
+              - column: { name: skill_id, valueNumeric: 205 }
+              - column: { name: title, value: "Проектирование схемы БД блога через JPA" }
+              - column: { name: description, value: "Опишите сущности User, Post, Comment и Tag. Настройте связи ManyToOne (связь комментарий-пост), ManyToMany (посты и теги) с использованием JPA аннотаций. Настройте ленивую загрузку (FetchType.LAZY) для предотвращения N+1 проблем." }
+        # Задание 6 для навыка 206
+        - insert:
+            tableName: assignments
+            columns:
+              - column: { name: id, valueNumeric: 306 }
+              - column: { name: skill_id, valueNumeric: 206 }
+              - column: { name: title, value: "Деплоймент веб-приложения в Kubernetes кластер" }
+              - column: { name: description, value: "Напишите YAML конфигурации для Kubernetes: Deployment (с 3 репликами вашего контейнера и пробами Liveness/Readiness), ClusterIP Service для внутреннего взаимодействия, и Ingress манифест для доступа из внешней сети." }
+        # Задание 7 для навыка 207
+        - insert:
+            tableName: assignments
+            columns:
+              - column: { name: id, valueNumeric: 307 }
+              - column: { name: skill_id, valueNumeric: 207 }
+              - column: { name: title, value: "Настройка CI/CD Pipeline в GitHub Actions" }
+              - column: { name: description, value: "Создайте workflow файл `.github/workflows/ci.yml`. Конвейер должен автоматически запускаться при пуше в main, выполнять установку зависимостей, прогонять unit-тесты, линтер, собирать Docker образ и загружать его в реестр." }
+
+        # 4. Критерии оценивания (Rubrics)
+        # Рубрики для задания 301
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 401 }
+              - column: { name: assignment_id, valueNumeric: 301 }
+              - column: { name: criterion_name, value: "Корректность JWT" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Токены генерируются без ошибок, содержат корректные claims и проверяются фильтром." }
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 402 }
+              - column: { name: assignment_id, valueNumeric: 301 }
+              - column: { name: criterion_name, value: "Безопасность эндпоинтов" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Неавторизованные запросы на защищенные URL возвращают 401 Unauthorized." }
+        # Рубрики для задания 302
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 403 }
+              - column: { name: assignment_id, valueNumeric: 302 }
+              - column: { name: criterion_name, value: "Работа роутера и редиректы" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Переходы работают без перезагрузки страницы, редирект для приватных роутов работает корректно." }
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 404 }
+              - column: { name: assignment_id, valueNumeric: 302 }
+              - column: { name: criterion_name, value: "Оптимизация" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Используется React.lazy и Suspense для ленивой загрузки страниц." }
+        # Рубрики для задания 303
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 405 }
+              - column: { name: assignment_id, valueNumeric: 303 }
+              - column: { name: criterion_name, value: "Качество Dockerfile" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Используется multi-stage build, минимизирован размер финального образа." }
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 406 }
+              - column: { name: assignment_id, valueNumeric: 303 }
+              - column: { name: criterion_name, value: "Работа docker-compose" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Оба контейнера запускаются, настроено ожидание готовности базы (depends_on с healthcheck)." }
+        # Рубрики для задания 304
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 407 }
+              - column: { name: assignment_id, valueNumeric: 304 }
+              - column: { name: criterion_name, value: "Управление состоянием Zustand" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Стор правильно спроектирован, экшены мутируют стейт немутабельно." }
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 408 }
+              - column: { name: assignment_id, valueNumeric: 304 }
+              - column: { name: criterion_name, value: "Стойкость и Persist" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Корзина восстанавливает выбранные товары при перезагрузке страницы через Zustand persist." }
+        # Рубрики для задания 305
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 409 }
+              - column: { name: assignment_id, valueNumeric: 305 }
+              - column: { name: criterion_name, value: "Связи сущностей JPA" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Все отношения (OneToMany, ManyToMany, ManyToOne) настроены корректно с джоин-таблицами." }
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 410 }
+              - column: { name: assignment_id, valueNumeric: 305 }
+              - column: { name: criterion_name, value: "Ленивая загрузка и N+1" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Настроена ленивая загрузка связей и продемонстрирована работа без N+1 запросов." }
+        # Рубрики для задания 306
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 411 }
+              - column: { name: assignment_id, valueNumeric: 306 }
+              - column: { name: criterion_name, value: "Репликация и доступность" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Deployment настраивает 3 реплики, настроены правильные пробы Liveness/Readiness." }
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 412 }
+              - column: { name: assignment_id, valueNumeric: 306 }
+              - column: { name: criterion_name, value: "Сервисы и Ингресс" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Service перенаправляет трафик на порты подов, Ingress корректно маршрутизирует внешний домен." }
+        # Рубрики для задания 307
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 413 }
+              - column: { name: assignment_id, valueNumeric: 307 }
+              - column: { name: criterion_name, value: "Пайплайн и шаги" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Все этапы (установка, тесты, линтер) настроены в правильном порядке и прерывают билд в случае ошибки." }
+        - insert:
+            tableName: rubrics
+            columns:
+              - column: { name: id, valueNumeric: 414 }
+              - column: { name: assignment_id, valueNumeric: 307 }
+              - column: { name: criterion_name, value: "Сборка Docker-образа" }
+              - column: { name: max_points, valueNumeric: 10 }
+              - column: { name: description, value: "Образ успешно собирается и загружается в Docker Hub/GitHub Container Registry." }
+
+        # Корректируем счетчики sequence для PK
+        - sql: { sql: "SELECT setval(pg_get_serial_sequence('skills', 'id'), coalesce(max(id), 1)) FROM skills;" }
+        - sql: { sql: "SELECT setval(pg_get_serial_sequence('assignments', 'id'), coalesce(max(id), 1)) FROM assignments;" }
+        - sql: { sql: "SELECT setval(pg_get_serial_sequence('rubrics', 'id'), coalesce(max(id), 1)) FROM rubrics;" }
+
+  - changeSet:
+      id: 012-seed-user-rooms-data-v2
+      author: blueprint
+      changes:
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (1, 101, 'ROOM_ADMIN') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (1, 102, 'ROOM_ADMIN') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (1, 103, 'ROOM_ADMIN') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (2, 101, 'MODERATOR') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (2, 102, 'MODERATOR') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (3, 101, 'EXPERT') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (3, 102, 'EXPERT') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (4, 102, 'STUDENT') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (5, 102, 'STUDENT') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (6, 101, 'STUDENT') ON CONFLICT (user_id, room_id) DO NOTHING;"
+        - sql:
+            sql: "INSERT INTO user_rooms (user_id, room_id, room_role) VALUES (7, 101, 'STUDENT') ON CONFLICT (user_id, room_id) DO NOTHING;"

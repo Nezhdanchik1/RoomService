@@ -17,3 +17,9 @@ databaseChangeLog:
       file: db/changelog/008-reseed-with-slugs.yaml
   - include:
       file: db/changelog/009-add-test-rooms.yaml
+  - include:
+      file: db/changelog/010-create-education-tables.yaml
+  - include:
+      file: db/changelog/011-create-expert-and-dispute-tables.yaml
+  - include:
+      file: db/changelog/012-seed-education-data.yaml

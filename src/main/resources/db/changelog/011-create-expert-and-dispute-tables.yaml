@@ -1,0 +1,114 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-create-expert-and-dispute-tables
+      author: antigravity
+      changes:
+        # 1. expert_validation_requests
+        - createTable:
+            tableName: expert_validation_requests
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: submission_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expert_id
+                  type: BIGINT
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_expert_validation_submission
+            baseTableName: expert_validation_requests
+            baseColumnNames: submission_id
+            referencedTableName: submissions
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # 2. disputes
+        - createTable:
+            tableName: disputes
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: submission_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: student_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: moderator_id
+                  type: BIGINT
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reason
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: resolution_comment
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_disputes_submission
+            baseTableName: disputes
+            baseColumnNames: submission_id
+            referencedTableName: submissions
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+      rollback:
+        - dropTable:
+            tableName: disputes
+        - dropTable:
+            tableName: expert_validation_requests

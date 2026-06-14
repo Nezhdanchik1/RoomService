@@ -3,6 +3,7 @@ package org.example.roomservice.dto;
 import lombok.*;
 
 import java.util.Set;
+import org.example.roomservice.model.RoomRole;
 
 @Getter
 @Setter
@@ -20,4 +21,5 @@ public class RoomListDto {
     private Long participantsCount;
     private Long postsCount;
     private Set<String> tags;
+    private RoomRole userRoomRole;
 }

@@ -33,7 +33,8 @@ public class GatewayHeaderFilter extends OncePerRequestFilter {
             List<SimpleGrantedAuthority> authorities = Arrays.stream(
                     rolesStr != null ? rolesStr.split(",") : new String[0])
                     .map(String::trim)
-                    .map(SimpleGrantedAuthority::new)
+                    .filter(role -> !role.isEmpty())
+                    .map(role -> new SimpleGrantedAuthority(toSpringAuthority(role)))
                     .collect(Collectors.toList());
 
             UsernamePasswordAuthenticationToken auth =
@@ -43,5 +44,10 @@ public class GatewayHeaderFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private static String toSpringAuthority(String role) {
+        String upper = role.toUpperCase();
+        return upper.startsWith("ROLE_") ? upper : "ROLE_" + upper;
     }
 }

@@ -76,12 +76,34 @@ public class RoomController {
     @PreAuthorize("hasRole('USER')")
     public UserRoomDto joinRoom(
             @PathVariable String roomSlug,
+            @RequestParam(required = false) Long userId,
             @RequestParam(required = false) RoomRole role,
             Principal principal
     ) {
-        Long userId = Long.valueOf(principal.getName());
+        Long currentUserId = Long.valueOf(principal.getName());
         Room room = roomService.getRoom(roomSlug);
-        UserRoom userRoom = userRoomService.joinRoom(userId, room, role);
+
+        Long targetUserId = currentUserId;
+        RoomRole targetRole = RoomRole.STUDENT;
+
+        if (userId != null && !userId.equals(currentUserId)) {
+            // Разрешено только глобальным ADMIN или локальным ROOM_ADMIN
+            RoomRole callerRole = userRoomService.getEffectiveRole(currentUserId, room);
+            boolean isGlobalAdmin = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+            if (isGlobalAdmin || callerRole == RoomRole.ROOM_ADMIN) {
+                targetUserId = userId;
+                targetRole = (role != null) ? role : RoomRole.STUDENT;
+            } else {
+                throw new org.springframework.security.access.AccessDeniedException("Not authorized to join other users");
+            }
+        } else {
+            // Обычный пользователь вступает сам - всегда роль STUDENT
+            targetRole = RoomRole.STUDENT;
+        }
+
+        UserRoom userRoom = userRoomService.joinRoom(targetUserId, room, targetRole);
         return userRoomMapper.toDto(userRoom);
     }
 
@@ -108,18 +130,35 @@ public class RoomController {
     public List<RoomListDto> getUserRooms(@PathVariable Long userId) {
         return userRoomService.getUserRooms(userId)
                 .stream()
-                .map(roomMapper::toDto)
+                .map(room -> {
+                    RoomListDto dto = roomMapper.toDto(room);
+                    RoomRole role = userRoomService.getEffectiveRole(userId, room);
+                    dto.setUserRoomRole(role);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     @PutMapping("/{roomSlug}/members/{userId}/role")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public UserRoomDto updateMemberRole(
             @PathVariable String roomSlug,
             @PathVariable Long userId,
-            @RequestParam RoomRole role
+            @RequestParam RoomRole role,
+            Principal principal
     ) {
+        Long currentUserId = Long.valueOf(principal.getName());
         Room room = roomService.getRoom(roomSlug);
+
+        // Разрешено только глобальным ADMIN или локальным ROOM_ADMIN этой комнаты
+        RoomRole callerRole = userRoomService.getEffectiveRole(currentUserId, room);
+        boolean isGlobalAdmin = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isGlobalAdmin && callerRole != RoomRole.ROOM_ADMIN) {
+            throw new org.springframework.security.access.AccessDeniedException("Only room administrators or global administrators can modify room member roles");
+        }
+
         UserRoom updated = userRoomService.updateUserRole(userId, room, role);
         return userRoomMapper.toDto(updated);
     }
