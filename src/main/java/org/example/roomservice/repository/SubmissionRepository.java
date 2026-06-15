@@ -12,6 +12,7 @@ import java.util.List;
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     List<Submission> findByAssignmentIdAndStudentId(Long assignmentId, Long studentId);
     List<Submission> findByStudentId(Long studentId);
+    long countByStudentId(Long studentId);
 
     @Query("SELECT s FROM Submission s WHERE s.assignment.id = :assignmentId AND s.studentId != :studentId " +
            "AND s.status = :status AND (SELECT COUNT(r) FROM Review r WHERE r.submission.id = s.id) < 2")

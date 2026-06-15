@@ -11,4 +11,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByReviewerIdAndStatus(Long reviewerId, ReviewStatus status);
     List<Review> findBySubmissionId(Long submissionId);
     List<Review> findBySubmissionIdAndStatus(Long submissionId, ReviewStatus status);
+    long countByReviewerIdAndStatus(Long reviewerId, ReviewStatus status);
 }

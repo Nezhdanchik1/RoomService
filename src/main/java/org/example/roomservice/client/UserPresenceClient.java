@@ -14,6 +14,9 @@ public class UserPresenceClient {
 
     private final WebClient userServiceWebClient;
 
+    @org.springframework.beans.factory.annotation.Value("${INTERNAL_API_TOKEN:default-secret}")
+    private String internalToken;
+
     public PresenceResponse getUsersPresence(List<Long> userIds) {
 
         PresenceRequest request = PresenceRequest.builder()
@@ -23,7 +26,7 @@ public class UserPresenceClient {
         return userServiceWebClient.post()
                 .uri("/internal/presence/users")
                 .bodyValue(request)
-                .header("X-Internal-Token", "room-service-secret")
+                .header("X-Internal-Token", internalToken)
                 .retrieve()
                 .bodyToMono(PresenceResponse.class)
                 .block(); // для MVC приложения допустимо

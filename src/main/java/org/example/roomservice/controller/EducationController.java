@@ -81,6 +81,25 @@ public class EducationController {
         return educationService.getAssignedReviews(reviewerId);
     }
 
+    // 7a. Получить мой баланс кредитов проверок
+    @GetMapping("/credits/my")
+    @PreAuthorize("hasRole('USER')")
+    public int getMyCredits(Principal principal) {
+        Long userId = Long.valueOf(principal.getName());
+        return educationService.getReviewCredits(userId);
+    }
+
+    // 7b. Запросить работу на проверку из пула
+    @PostMapping("/reviews/request")
+    @PreAuthorize("hasRole('USER')")
+    public ReviewDto requestReviewAssignment(
+            @RequestParam Long assignmentId,
+            Principal principal
+    ) {
+        Long reviewerId = Long.valueOf(principal.getName());
+        return educationService.requestReviewAssignment(assignmentId, reviewerId);
+    }
+
     // 8. Отправить рецензию (доступно пользователям)
     @PostMapping("/reviews/{reviewId}/submit")
     @PreAuthorize("hasRole('USER')")

@@ -142,6 +142,18 @@ public class EducationService {
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment not found with id: " + assignmentId));
 
+        // Проверяем кредитный баланс
+        int currentCredits = getReviewCredits(studentId);
+        if (currentCredits < 0) {
+            // Проверяем, есть ли вообще работы других студентов для проверки по этому заданию
+            boolean hasCandidates = hasReviewCandidatesForAssignment(studentId, assignmentId);
+            if (hasCandidates) {
+                throw new org.springframework.security.access.AccessDeniedException(
+                    "Недостаточно лимита проверок. Вы должны проверить работы других студентов (минимум 2 рецензии на каждую вашу работу), прежде чем отправлять новые решения."
+                );
+            }
+        }
+
         // Проверяем, есть ли уже решение от этого студента
         List<Submission> existingSubmissions = submissionRepository.findByAssignmentIdAndStudentId(assignmentId, studentId);
         Submission submission;
@@ -178,11 +190,86 @@ public class EducationService {
         }
 
         // --- Алгоритм Task Dispatcher ---
-        runTaskDispatcher(submission, studentId, assignmentId);
+        // runTaskDispatcher(submission, studentId, assignmentId); // Отключено в пользу ручного пула рецензий
 
         publishSubmissionSubmittedEvent(studentId, submission);
 
         return mapToSubmissionDto(submission);
+    }
+
+    public int getReviewCredits(Long userId) {
+        long reviewsCount = reviewRepository.countByReviewerIdAndStatus(userId, ReviewStatus.SUBMITTED);
+        long submissionsCount = submissionRepository.countByStudentId(userId);
+        return (int) (2 + reviewsCount - (submissionsCount * 2));
+    }
+
+    private boolean hasReviewCandidatesForAssignment(Long studentId, Long assignmentId) {
+        List<Submission> pendingCandidates = submissionRepository.findCandidateSubmissionsForReview(assignmentId, studentId, SubmissionStatus.PENDING);
+        List<Submission> underReviewCandidates = submissionRepository.findCandidateSubmissionsForReview(assignmentId, studentId, SubmissionStatus.UNDER_REVIEW);
+        
+        List<Submission> allCandidates = new ArrayList<>();
+        allCandidates.addAll(pendingCandidates);
+        allCandidates.addAll(underReviewCandidates);
+        
+        for (Submission c : allCandidates) {
+            List<Review> reviews = reviewRepository.findBySubmissionId(c.getId());
+            boolean alreadyReviewed = reviews.stream()
+                    .anyMatch(r -> r.getReviewerId().equals(studentId));
+            if (!alreadyReviewed) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ReviewDto requestReviewAssignment(Long assignmentId, Long reviewerId) {
+        List<Submission> pendingCandidates = submissionRepository.findCandidateSubmissionsForReview(assignmentId, reviewerId, SubmissionStatus.PENDING);
+        List<Submission> underReviewCandidates = submissionRepository.findCandidateSubmissionsForReview(assignmentId, reviewerId, SubmissionStatus.UNDER_REVIEW);
+        
+        List<Submission> candidates = new ArrayList<>();
+        candidates.addAll(pendingCandidates);
+        candidates.addAll(underReviewCandidates);
+        
+        Submission targetSubmission = null;
+        for (Submission candidate : candidates) {
+            List<Review> existingReviews = reviewRepository.findBySubmissionId(candidate.getId());
+            boolean alreadyAssigned = existingReviews.stream()
+                    .anyMatch(r -> r.getReviewerId().equals(reviewerId));
+            
+            if (!alreadyAssigned) {
+                long activeReviewsCount = existingReviews.stream()
+                        .filter(r -> r.getStatus() == ReviewStatus.SUBMITTED || 
+                                    (r.getStatus() == ReviewStatus.DRAFT && r.getCreatedAt().isAfter(LocalDateTime.now().minusHours(1))))
+                        .count();
+                
+                if (activeReviewsCount < 2) {
+                    targetSubmission = candidate;
+                    break;
+                }
+            }
+        }
+        
+        if (targetSubmission == null) {
+            throw new org.example.roomservice.exception.NotFoundException(
+                "Нет доступных решений для проверки в данный момент. Пожалуйста, попробуйте позже."
+            );
+        }
+        
+        Review review = Review.builder()
+                .submission(targetSubmission)
+                .reviewerId(reviewerId)
+                .status(ReviewStatus.DRAFT)
+                .build();
+        
+        Review saved = reviewRepository.save(review);
+        
+        if (targetSubmission.getStatus() == SubmissionStatus.PENDING) {
+            targetSubmission.setStatus(SubmissionStatus.UNDER_REVIEW);
+            submissionRepository.save(targetSubmission);
+        }
+        
+        log.info("Assigned submission ID {} to reviewer {} via manual request", targetSubmission.getId(), reviewerId);
+        return mapToReviewDto(saved);
     }
 
     private void runTaskDispatcher(Submission submission, Long studentId, Long assignmentId) {

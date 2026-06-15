@@ -13,8 +13,8 @@ public class ContentClient {
 
     private final WebClient webClient;
 
-    public ContentClient(WebClient.Builder builder) {
-        this.webClient = builder.baseUrl("http://localhost:8083/api/posts").build();
+    public ContentClient(WebClient.Builder builder, @org.springframework.beans.factory.annotation.Value("${CONTENT_SERVICE_URL:http://localhost:8083}") String contentUrl) {
+        this.webClient = builder.baseUrl(contentUrl + "/api/posts").build();
     }
 
     public Mono<Map<Long, Long>> getPostsCount(List<Long> roomIds) {
