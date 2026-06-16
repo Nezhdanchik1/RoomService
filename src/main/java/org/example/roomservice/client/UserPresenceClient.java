@@ -14,7 +14,7 @@ public class UserPresenceClient {
 
     private final WebClient userServiceWebClient;
 
-    @org.springframework.beans.factory.annotation.Value("${INTERNAL_API_TOKEN:default-secret}")
+    @org.springframework.beans.factory.annotation.Value("${INTERNAL_API_TOKEN:room-service-secret}")
     private String internalToken;
 
     public PresenceResponse getUsersPresence(List<Long> userIds) {

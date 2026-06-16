@@ -565,21 +565,23 @@ public class EducationService {
 
     // Получить ожидающие проверки работы для эксперта
     public List<ExpertValidationRequestDto> getPendingValidationsForExpert(Long userId) {
-        List<UserDirection> directions = userDirectionRepository.findById_UserId(userId);
-        if (directions.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<Long> directionIds = directions.stream().map(d -> d.getId().getDirectionId()).collect(Collectors.toList());
-        
-        List<Room> rooms = roomRepository.findAll().stream()
-                .filter(r -> directionIds.contains(r.getDirection().getId()))
-                .collect(Collectors.toList());
-        if (rooms.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<Long> roomIds = rooms.stream().map(Room::getId).collect(Collectors.toList());
+        var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        boolean isGlobalAdmin = auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
-        return expertValidationRequestRepository.findBySubmissionAssignmentSkillRoomIdInAndStatus(roomIds, ExpertValidationStatus.PENDING).stream()
+        List<ExpertValidationRequest> allPending = expertValidationRequestRepository.findByStatus(ExpertValidationStatus.PENDING);
+
+        if (isGlobalAdmin) {
+            return allPending.stream()
+                    .map(this::mapToExpertValidationDto)
+                    .collect(Collectors.toList());
+        }
+
+        return allPending.stream()
+                .filter(req -> {
+                    Room room = req.getSubmission().getAssignment().getSkill().getRoom();
+                    return isModeratorOfRoom(userId, room);
+                })
                 .map(this::mapToExpertValidationDto)
                 .collect(Collectors.toList());
     }
@@ -593,10 +595,13 @@ public class EducationService {
             throw new AlreadyExistsException("Request has already been processed");
         }
 
-        Long directionId = request.getSubmission().getAssignment().getSkill().getRoom().getDirection().getId();
-        boolean isExpert = userDirectionRepository.existsById(new UserDirectionId(expertId, directionId));
-        if (!isExpert) {
-            throw new org.example.roomservice.exception.ForbiddenException("You are not an expert for this direction");
+        Room room = request.getSubmission().getAssignment().getSkill().getRoom();
+        var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        boolean isGlobalAdmin = auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isGlobalAdmin && !isModeratorOfRoom(expertId, room)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to resolve expert validations in this room");
         }
 
         request.setExpertId(expertId);
